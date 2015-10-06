@@ -27,6 +27,7 @@ Original data:
    
 
 References: 
+
  (1) Muscarella, R., Galante, P. J., Soley-Guardia, M., Boria, R. A., Kass, J. M., Uriarte, 
      M., Anderson, R. P. (2014) ENMeval: An R package for conducting spatially independent 
      evaluations and estimating optimal model complexity for Maxent ecological niche models. 

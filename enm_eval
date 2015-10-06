@@ -1,0 +1,163 @@
+
+
+library(sp)
+library(raster)
+library(rJava)
+
+options(java.parameters = "-Xmx1g" )  #to give 1GB of memory
+library(dismo)
+
+library(ENMeval)
+
+
+setwd(".../pollinat_xavi/data/ENM_eval/")
+load(".../pollinat_xavi/data/ENM_eval/enm_eval_ws.RData")
+
+
+library(devtools)
+#install_github("bobmuscarella/ENMeval@master")   #to install the last version of ENMeval from the GitHub repository of Bob Muscarella (https://github.com/bobmuscarella/ENMeval)
+install_github("xavi-rp/ENMeval@xrp")     # to install the modified version of ENMeval to be able to change the "prevalence" in Maxent models  (https://github.com/xavi-rp/ENMeval/tree/xrp)
+#install_github("xavi-rp/ENMeval@xrp2")    # to print maxent model and see what prevalence was used
+
+
+
+# file with presence points
+
+presences_91_12 <- read.table(".../pollinat_xavi/data/data_maxent/presences_91_12_maxent_meters.csv", header=TRUE, sep=',')
+str(presences_91_12)
+head(presences_91_12)
+
+
+species <- levels(presences_91_12$species)  #vector with all the species to compute SDM
+species
+
+#species <- c("Bom_alp_nus", "Bom_ter_ris") #this is to compute SDM just for one/some species
+#species <- c("Bom_mon_ola") #this is to compute SDM just for one/some species
+#species <- c("Bom_alp_nus", "Bom_ter_ris", "Bom_bal_tus", "Bom_hor_rum", "Bom_mon_ola") #this is to compute SDM just for one/some species
+
+
+
+#prevalences table
+prevalence <- read.table(".../pollinat_xavi/data/data_maxent/prevalence_91_12.csv", header=TRUE, sep=',')
+head(prevalence)
+prevalence$revised_tau2 <- round(prevalence$revised_tau, digits = 1)
+
+
+###list of variables to run maxent
+
+files <- list.files(path=".../pollinat_xavi/data/ENM_eval/vars", pattern=".asc$", full.names = TRUE)
+files
+
+
+#stacking the variables
+
+predictors <- stack(files)
+predictors
+
+
+#creating a background raster.
+#This is to limit the background to the area where any bumblebee species was found (TGB; target Group Background)
+#The reason behind this is to restrict the bias on data sampling
+
+pts <- presences_91_12[,c("LONG", "LATI")]
+bkg_rstr <- rasterize(x=pts, y=predictors, fun='first', background=NA)
+  
+str(bkg_rstr)
+summary(bkg_rstr)
+
+
+
+#### running ENMEval #####
+
+# https://github.com/bobmuscarella/ENMeval       #source code of the library
+# https://github.com/xavi-rp/ENMeval/tree/xrp    #modified code from Muscarella's one in order to be able to modify prevalence
+
+
+#compute the model for each species
+
+for (sp in (1:length(species))) {   #to make a data frame with presences for each species
+  
+  print(species[sp])
+  print(Sys.time())
+  
+  sp1 <- presences_91_12[(presences_91_12$species %in% species[sp]),]  #to select for each species
+  sp1 <- droplevels(sp1)
+  sp1 <- sp1[,-1]
+  #print(str(sp1))
+  #print(summary(sp1))
+  #head(sp1)
+  name <- species[sp]
+  assign(name, sp1)  #to save in the environment a data frame with the presences for each species
+  
+  
+  #selecting modified prevalence (revised_tau) for each species
+  
+  rev_tau <- prevalence[(prevalence$species_code %in% species[sp]),]
+  rev_tau <- rev_tau$revised_tau2
+  #print(paste0("rev_tau = ", rev_tau))
+  
+  
+  #creating background points (from TGB)
+  
+  bkg_pts <- randomPoints(bkg_rstr, n= 10000, p=sp1, ext=NULL, extf=1, excludep=TRUE, prob=FALSE,
+                          cellnumbers=FALSE, tryf=3, warn=2, lonlatCorrection=TRUE)
+  
+  
+  #Creating a directory to store the results
+  
+  name <- paste0("ENMEval_mdls_", species[sp])
+  
+  
+  if (!file.exists(paste0(".../pollinat_xavi/data/ENM_eval/", name)))  {     #exists the file?
+    dir.create(paste0(".../pollinat_xavi/data/ENM_eval/", name))             #if not, create it
+    print(paste0("Directory ", name, " created"))
+  } else {
+    print(paste0("Directory ", name, " already exists"))
+  }
+  
+  
+  # fitting the model for each species (method of partitioning: random k-fold
+  
+  ENMev_mdls <- ENMevaluate(occ=sp1, env=predictors,
+                            bg.coords=as.data.frame(bkg_pts),
+                            categoricals=NULL, method="randomkfold",
+                            occ.grp = NULL, bg.grp = NULL,
+                            RMvalues = c(0.5, 1, 2, 4, 6), fc = c("L", "LQ", "H", "LQHPT"), 
+                            #RMvalues = seq(0.5, 4, 0.5), fc = c("L", "LQ", "H", "LQH", "LQHP", "LQHPT"), 
+                            #RMvalues = seq(1, 2, 1), fc = c("L", "LQ"),
+                            defaultprevalence = rev_tau,
+                            kfolds = 10,
+                            overlap = TRUE, 
+                            bin.output = TRUE, clamp = TRUE,
+                            rasterPreds = TRUE, parallel = TRUE, numCores = 2)
+  
+  
+  write.csv(ENMev_mdls@results, file = paste0(".../pollinat_xavi/data/ENM_eval/", name, "/ENMev_mdls", name, ".csv"), quote=TRUE)  #to export a table with the results
+  
+  print(name)
+  print(Sys.time())
+  
+  
+  assign(name, ENMev_mdls)  #to save in the environment the results from ENMevaluate
+  
+  
+  remove(name)
+  remove(sp1)
+  remove(rev_tau)
+
+  print(Sys.time())
+
+}
+
+
+#Exploring the results
+
+ENMev_mdls@results
+ENMev_mdls@models
+ENMev_mdls@predictions
+ENMev_mdls@overlap        # the statistic ranges from 0 (no overlap) to 1 (identical distributions). "D" similarity statistic of Warren (2009)
+ENMev_mdls
+
+
+save.image(".../pollinat_xavi/data/ENM_eval/enm_eval_ws.RData")
+

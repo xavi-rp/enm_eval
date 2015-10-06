@@ -20,14 +20,18 @@ Big AUC_diff, equal to overfit models.
 Original data:  
    -presences_91_12_maxent_meters.csv <- presences of bumblebee species with more than 25 unique 
          records in Europe between 1991-2012 (Rasmont et al., 2015)
+         
    -table of prevalences
+   
    -explanatory variables to run Maxent
+   
 
 References: 
  (1) Muscarella, R., Galante, P. J., Soley-Guardia, M., Boria, R. A., Kass, J. M., Uriarte, 
      M., Anderson, R. P. (2014) ENMeval: An R package for conducting spatially independent 
      evaluations and estimating optimal model complexity for Maxent ecological niche models. 
      Methods in Ecology and Evolution, 5: 1198–1205. doi: 10.1111/2041-210X.12261
+     
  (2) Rasmont P., Franzén M., Lecocq T., Harpke A., Roberts S.P.M., Biesmeijer J.C., Castro L.,
      Cederberg B., Dvorák L., Fitzpatrick Ú., Gonseth Y., Haubruge E., Mahé G., Manino A., 
      Michez D., Neumayer J., Ødegaard F., Paukkunen J., Pawlikowski T., Potts S.G., Reemer M., 

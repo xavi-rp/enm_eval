@@ -156,5 +156,49 @@ ENMev_mdls@overlap        # the statistic ranges from 0 (no overlap) to 1 (ident
 ENMev_mdls
 
 
+
+#### Extracting best combination of parameters for each species ####
+
+# The best combination is that with delata.AICc=0. 
+# If there are more than 1 result with delata.AICc=0, we choose the lower rm but 
+# greater than 1 (Radosavljevic & Anderson, 2014)
+
+
+best_rm_f <- data.frame()
+
+for (sp in (1:length(species))) {   #to extract results for each species
+  
+
+  delta_aicc <- c()
+  mod <- get(paste0("ENMEval_mdls_", species[sp]), envir=.GlobalEnv)
+  mod@results$delta.AICc
+  delta_aicc <- mod@results[(mod@results$delta.AICc %in% 0),]   #selecting those rows with delata.AICc=0
+  delta_aicc <- droplevels(delta_aicc)
+  #delta_aicc[,2]
+  #delta_aicc[,3]
+  
+  if (nrow(delta_aicc)>1) {   #If there are more than 1 delata.AICc=0, to choose the lower, but greater than 1
+    
+    delta_aicc <- delta_aicc[delta_aicc$rm >= 1,]
+    delta_aicc <- delta_aicc[which.min(delta_aicc$rm),]
+    delta_aicc <- droplevels(delta_aicc)
+    delta_aicc <- droplevels(delta_aicc)
+    
+    
+  } else {
+    
+    delta_aicc <- delta_aicc
+    
+  }
+  
+  best_rm_f <- rbind(best_rm_f, data.frame(species = species[sp], features = delta_aicc[,2], rm = format(delta_aicc[,3], nsmall = 0)))
+  
+}
+
+
+write.csv(best_rm_f, file = ".../pollinat_xavi/data/ENM_eval/best_rm_features.csv", quote=TRUE)
+
+
+
 save.image(".../pollinat_xavi/data/ENM_eval/enm_eval_ws.RData")
 

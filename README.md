@@ -40,7 +40,7 @@ References:
      Bumblebees. Biorisk 10 (Special Issue), 246 pp.
  (3) Radosavljevic, A., Anderson, R. P. (2014), Making better Maxent models of species 
      distributions: complexity, overfitting and evaluation. Journal of Biogeography, 41: 629–643.
-     doi: 10.1111/jbi.12227
+     doi: 10.1111/jbi.12227 
    
 
 

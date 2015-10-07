@@ -31,10 +31,7 @@ head(presences_91_12)
 species <- levels(presences_91_12$species)  #vector with all the species to compute SDM
 species
 
-#species <- c("Bom_alp_nus", "Bom_ter_ris") #this is to compute SDM just for one/some species
-#species <- c("Bom_mon_ola") #this is to compute SDM just for one/some species
-#species <- c("Bom_alp_nus", "Bom_ter_ris", "Bom_bal_tus", "Bom_hor_rum", "Bom_mon_ola") #this is to compute SDM just for one/some species
-
+#species <- c("Bom_alpinus", "Bom_terrestris") #this is to compute SDM just for one/some species
 
 
 #prevalences table

@@ -15,7 +15,7 @@ goodness-of-fit and complexity and it is independent of the partitioning method 
 it is computed with the full set of presences.
 The model with the lowest AICc value (i.e. Delta_AICc = 0) is considered the best model out 
 of the current suite of models.
-Big AUC_diff, equal to overfit models. 
+Big AUC_diff, equal to overfitted models. 
 
 Original data:  
    -presences_91_12_maxent_meters.csv <- presences of bumblebee species with more than 25 unique 

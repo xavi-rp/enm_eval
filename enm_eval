@@ -16,7 +16,7 @@ load(".../pollinat_xavi/data/ENM_eval/enm_eval_ws.RData")
 
 library(devtools)
 #install_github("bobmuscarella/ENMeval@master")   #to install the last version of ENMeval from the GitHub repository of Bob Muscarella (https://github.com/bobmuscarella/ENMeval)
-install_github("xavi-rp/ENMeval@xrp")     # to install the modified version of ENMeval to be able to change the "prevalence" in Maxent models  (https://github.com/xavi-rp/ENMeval/tree/xrp)
+install_github("xavi-rp/ENMeval@xrp")     # to install the modified version of ENMeval (v. 0.2.0) to be able to change the "prevalence" in Maxent models  (https://github.com/xavi-rp/ENMeval/tree/xrp)
 #install_github("xavi-rp/ENMeval@xrp2")    # to print maxent model and see what prevalence was used
 
 

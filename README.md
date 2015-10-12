@@ -1,6 +1,6 @@
 # enm_eval
 
-Example of using ENMevaluate (library: ENMeval) with models to predict several bumblebee distributions in Europe, modifying prevalence (MaxEnt parameter).
+Example of using ENMevaluate (library: ENMeval; v. 0.2.0) with models to predict several bumblebee distributions in Europe, modifying prevalence (MaxEnt parameter).
 
 Created on: 6th October, 2015
 
